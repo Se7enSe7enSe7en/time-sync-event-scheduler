@@ -25,6 +25,8 @@ AI automation scheduler for self time management or small time event organizing 
 
 #### Nuxt desired specs
 
+- nuxt 4
+- pnpm
 - Typescript: https://www.typescriptlang.org/
 - Vue3 composition api: https://vuejs.org/api/composition-api-setup.html#composition-api-setup
 - tailwind: https://tailwindcss.com/
@@ -32,11 +34,11 @@ AI automation scheduler for self time management or small time event organizing 
 
 ## Backend
 
-### ORM + query builder: **prisma-kysely**
+### ORM + query builder + adapter: **prisma-kysely**
 
-- prisma-kysely: https://github.com/valtyr/prisma-kysely
-- prisma: https://www.prisma.io/docs/guides/nuxt
-- kysely: https://kysely.dev/docs/intro
+- (Adapter) prisma-kysely: https://github.com/valtyr/prisma-kysely
+- (ORM) prisma: https://www.prisma.io/docs/guides/nuxt
+- (Query Builder) kysely: https://kysely.dev/docs/intro
 
 ### DB: **supabase + postgresql**
 
