@@ -18,6 +18,9 @@
     "vue-router": "^4.6.4"
   },
   "devDependencies": {
+    "@types/node": "^25.0.10",
+    "dotenv": "^17.2.3",
+    "prisma": "^7.3.0",
     "prisma-kysely": "^3.0.0"
   }
 }

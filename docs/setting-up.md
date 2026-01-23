@@ -1,3 +1,10 @@
+## Antigravity browser settings add these in the allow url
+
+- nuxt.com
+- docs.n8n.io
+- prisma.io
+- kysely.dev
+
 ## Install Frontend tools
 
 ### Initialize Nuxt 4 using nuxi (nuxt cli tool)
@@ -25,4 +32,25 @@ npm install kysely pg
 
 ```sh
 npx prisma init
+```
+
+### Setup prisma-kysely, replace the defualt client generator in your `schema.prisma`
+
+```ts
+generator kysely {
+    provider = "prisma-kysely"
+
+    // Optionally provide a destination directory for the generated file
+    // and a filename of your choice
+    output = "../src/db"
+    fileName = "types.ts"
+    // Optionally generate runtime enums to a separate file
+    enumFileName = "enums.ts"
+}
+```
+
+### Generate Kysely base types
+
+```sh
+npx prisma generate
 ```
