@@ -54,3 +54,23 @@ generator kysely {
 ```sh
 npx prisma generate
 ```
+
+### Setup local db with supabase cli
+
+#### Initialize supabase
+
+```sh
+npx supabase init
+```
+
+#### Start supabase (requires docker running)
+
+```sh
+npx supabase start
+```
+
+#### Once the DB is running, push the schema
+
+```sh
+npx prisma db push
+```
