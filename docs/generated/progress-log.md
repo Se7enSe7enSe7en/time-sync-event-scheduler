@@ -45,3 +45,14 @@
   npx nuxi@latest module add supabase
   ```
 - **Configured Nuxt:** Updated `nuxt.config.ts` to include the Supabase module and disable automatic redirects (for manual control).
+
+## 2026-01-28 - Local Supabase CLI Setup
+
+- **Installing Supabase CLI:** Installing the Supabase CLI as a dev dependency via pnpm.
+  ```bash
+  pnpm add -D supabase
+  ```
+- **Starting Local Supabase:** Spinning up the local database and services using the local CLI instance.
+  ```bash
+  npx supabase start
+  ```

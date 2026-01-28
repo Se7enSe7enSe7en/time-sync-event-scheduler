@@ -10,13 +10,13 @@
 ### Initialize Nuxt 4 using nuxi (nuxt cli tool)
 
 ```sh
-npx nuxi@latest init . --force
+pnpm dlx nuxi@latest init . --force
 ```
 
 ### Adding TailwindCSS through nuxi
 
 ```sh
-npx nuxi@latest module add tailwindcss
+pnpm dlx nuxi@latest module add tailwindcss
 ```
 
 ### Install tailwind autocomplete extension
@@ -26,7 +26,7 @@ npx nuxi@latest module add tailwindcss
 ### Initialize tailwind.config.js using tailwind cli
 
 ```sh
-npx tailwindcss init
+pnpm dlx tailwindcss init
 ```
 
 ## Install Database and Backend tools
@@ -34,14 +34,15 @@ npx tailwindcss init
 ### Prisma (ORM), Kysely (Query Builder), Prisma-Kysely (Adapter), Postgres (Driver)
 
 ```sh
-npm install -D prisma prisma-kysely
-npm install kysely pg
+pnpm install -D prisma prisma-kysely
+pnpm approve-builds
+pnpm install kysely pg
 ```
 
 ### Initialize Prisma
 
 ```sh
-npx prisma init
+pnpm prisma init
 ```
 
 ### Setup prisma-kysely, replace the defualt client generator in your `schema.prisma`
@@ -62,25 +63,32 @@ generator kysely {
 ### Generate Kysely base types
 
 ```sh
-npx prisma generate
+pnpm prisma generate
 ```
 
 ### Setup local db with supabase cli
 
+#### Add supabase cli to dev deps
+
+```sh
+pnpm add -D supabase
+pnpm approve-builds
+```
+
 #### Initialize supabase
 
 ```sh
-npx supabase init
+pnpm supabase init
 ```
 
 #### Start supabase (requires docker running)
 
 ```sh
-npx supabase start
+pnpm supabase start
 ```
 
 #### Once the DB is running, push the schema
 
 ```sh
-npx prisma db push
+pnpm prisma db push
 ```
