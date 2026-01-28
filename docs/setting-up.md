@@ -19,6 +19,16 @@ npx nuxi@latest init . --force
 npx nuxi@latest module add tailwindcss
 ```
 
+### Install tailwind autocomplete extension
+
+- https://open-vsx.org/vscode/item?itemName=bradlc.vscode-tailwindcss
+
+### Initialize tailwind.config.js using tailwind cli
+
+```sh
+npx tailwindcss init
+```
+
 ## Install Database and Backend tools
 
 ### Prisma (ORM), Kysely (Query Builder), Prisma-Kysely (Adapter), Postgres (Driver)
