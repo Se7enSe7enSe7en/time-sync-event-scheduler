@@ -20,10 +20,72 @@ datasource db {
 }
 
 model Profile {
-  id        String   @default(uuid())
-  userId    String   @unique // Links to Supabase Auth ID
+  id        String   @id @default(uuid())
+  userId    String   @unique @map("user_id") // Links to Supabase Auth ID
   email     String   @unique
   name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  timezone  String   @default("UTC")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  memberships  GroupMember[]
+  ownedGroups  Group[]
+  availability Availability[]
+
+  @@map("profiles")
+}
+
+model Group {
+  id          String        @id @default(uuid())
+  name        String
+  description String?
+  code        String        @unique
+  ownerId     String        @map("owner_id")
+  owner       Profile       @relation(fields: [ownerId], references: [id])
+  members     GroupMember[]
+  events      Event[]
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  @@map("groups")
+}
+
+model GroupMember {
+  id        String   @id @default(uuid())
+  groupId   String   @map("group_id")
+  group     Group    @relation(fields: [groupId], references: [id])
+  profileId String   @map("profile_id")
+  profile   Profile  @relation(fields: [profileId], references: [id])
+  role      String   @default("MEMBER") // ADMIN, MEMBER
+  joinedAt  DateTime @default(now()) @map("joined_at")
+
+  @@unique([groupId, profileId])
+  @@map("group_members")
+}
+
+model Availability {
+  id        String  @id @default(uuid())
+  profileId String  @map("profile_id")
+  profile   Profile @relation(fields: [profileId], references: [id])
+  dayOfWeek Int     @map("day_of_week") // 0=Sunday, 1=Monday...
+  startTime String  @map("start_time") // "HH:mm" 24h format
+  endTime   String  @map("end_time") // "HH:mm" 24h format
+
+  @@index([profileId])
+  @@map("availability")
+}
+
+model Event {
+  id          String   @id @default(uuid())
+  groupId     String   @map("group_id")
+  group       Group    @relation(fields: [groupId], references: [id])
+  title       String
+  description String?
+  startTime   DateTime @map("start_time")
+  endTime     DateTime @map("end_time")
+  location    String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("events")
 }
