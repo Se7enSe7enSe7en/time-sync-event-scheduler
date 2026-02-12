@@ -1,6 +1,6 @@
-# Nuxt Minimal Starter
+# Time Sync Event Scheduler
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+The Time Sync Event Scheduler (a.k.a. "G") is an AI automation scheduler for self time management or small time event organizing like scheduled gaming sessions with friends.
 
 ## Setup
 
