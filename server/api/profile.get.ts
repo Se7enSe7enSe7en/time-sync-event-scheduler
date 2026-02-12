@@ -1,5 +1,4 @@
 import { serverSupabaseUser } from "#supabase/server";
-import { db } from "../utils/db";
 
 export default defineEventHandler(async (event) => {
   // 1. Get the authenticated user from Supabase

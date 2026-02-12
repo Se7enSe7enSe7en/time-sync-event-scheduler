@@ -1,5 +1,3 @@
-import { db } from "../utils/db";
-
 export default defineEventHandler(async () => {
   // create a dummy user
   try {

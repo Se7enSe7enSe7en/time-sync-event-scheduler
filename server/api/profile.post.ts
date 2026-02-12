@@ -1,6 +1,5 @@
 import { serverSupabaseUser } from "#supabase/server";
 import { randomUUID } from "crypto";
-import { db } from "../utils/db";
 
 export default defineEventHandler(async (event) => {
   // 1. Authenticate

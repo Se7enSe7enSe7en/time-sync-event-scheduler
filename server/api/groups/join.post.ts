@@ -1,5 +1,4 @@
 import { serverSupabaseUser } from "#supabase/server";
-import { db } from "../utils/db";
 import { randomUUID } from "crypto";
 
 export default defineEventHandler(async (event) => {
