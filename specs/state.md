@@ -1,6 +1,6 @@
 # Implementation Plan
 
-Based on `specs.md`, this plan outlines the steps to build the Time Sync Event Scheduler.
+Based on `specs/main.md`, this plan outlines the steps to build the Time Sync Event Scheduler.
 
 ## Phase 1: Foundation & Database
 

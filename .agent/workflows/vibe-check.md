@@ -10,4 +10,5 @@ description: Agent will do a quick read to all of current changes by the user an
 3.1.) is it optimal enough? (as long as it doesn't cause huge performance hit)
 3.2.) is it maintainable enough? (it doesn't have to be super maintainable)
 3.3.) is there a better alternative? (if there is, write a commented version of the code below the current code, if it is big refactor, create an .md file document for the plan and explaination in docs/generated/refactor/)
-4.) before checking, read specs.md to get more context (eg. tech stack, features) to get the intention for code.
+4.) before checking, read specs/main.md to get more context (eg. tech stack, features) to get the intention for code.
+5.) update specs/state.md if necessary after checking the codebase

@@ -59,7 +59,7 @@ model GroupMember {
   role      String   @default("MEMBER") // ADMIN, MEMBER
   joinedAt  DateTime @default(now()) @map("joined_at")
 
-  @@unique([groupId, profileId])
+  @@unique([groupId, profileId]) // composite unique - the combination of columns can't repeat
   @@map("group_members")
 }
 
