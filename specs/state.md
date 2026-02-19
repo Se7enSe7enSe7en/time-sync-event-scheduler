@@ -24,14 +24,18 @@ Based on `specs/main.md`, this plan outlines the steps to build the Time Sync Ev
 
 ## Phase 3: Core Feature - Groups/Lobbies
 
-- [ ] **Backend API**
+- [x] **Backend API**
   - `POST /api/groups`: Create a group.
   - `POST /api/groups/join`: Join via code.
   - `GET /api/groups`: List user's groups.
-  - `GET /api/groups/:id`: Get group details & members.
-- [ ] **Frontend Pages**
-  - `/dashboard`: List joined groups, button to "Create Group" or "Join Group".
-  - `/groups/[id]`: Group details view.
+  - `GET /api/groups/:id`: Get group details & members. ✅ Includes membership check + camelCase response mapping.
+- [x] **Frontend Pages**
+  - `/dashboard`: Basic placeholder with sign-out. (will be enriched in Phase 4)
+  - `/groups/[id]`: Group details view with real data. ✅ Grid layout fixed, wired to API.
+  - `/groups`: List + Create + Join groups. ✅ Done.
+- [x] **Shared Types**
+  - `shared/types/types.ts`: App-facing types (`Group`, `GroupMember`, `Profile`, `Role`).
+  - `shared/types/groups.ts`: API response types (`GroupDetailResponse`).
 
 ## Phase 4: Core Feature - Scheduling Logic
 
@@ -51,4 +55,4 @@ Based on `specs/main.md`, this plan outlines the steps to build the Time Sync Ev
 
 ---
 
-**Next Immediate Action**: Execute Phase 1 (Schema Update).
+**Next Immediate Action**: Begin Phase 4 — Scheduling Logic.

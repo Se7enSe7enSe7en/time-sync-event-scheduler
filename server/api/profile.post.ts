@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
   const user = await serverSupabaseUser(event);
 
   // Handle case where user object is a JWT payload (local dev quirk?)
-  const userId = user?.id || (user as any)?.sub;
+  const userId = user?.sub;
   const email = user?.email;
 
   if (!userId || !email) {

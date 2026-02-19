@@ -3,7 +3,7 @@ import { serverSupabaseUser } from "#supabase/server";
 export default defineEventHandler(async (event) => {
   // 1. Get the authenticated user from Supabase
   const user = await serverSupabaseUser(event);
-  const userId = user?.id || (user as any)?.sub;
+  const userId = user?.sub;
 
   if (!userId) {
     throw createError({

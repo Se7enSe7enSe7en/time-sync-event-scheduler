@@ -3,12 +3,12 @@ const user = useSupabaseUser()
 const router = useRouter()
 const client = useSupabaseClient()
 
-// Protect Route
 definePageMeta({
+  path: "/",
+  alias: ["/dashboard"],
   middleware: 'auth'
 })
 
-// Logout function
 const logout = async () => {
   await client.auth.signOut()
   router.push('/login')
@@ -20,7 +20,8 @@ const logout = async () => {
     <div class="max-w-4xl mx-auto">
       <div class="flex justify-between items-center mb-8">
         <h1 class="text-3xl font-bold">Dashboard</h1>
-        <button @click="logout" class="px-4 py-2 bg-red-500/10 text-red-400 border border-red-500/20 rounded-lg hover:bg-red-500/20 transition-colors">
+        <button @click="logout"
+          class="px-4 py-2 bg-red-500/10 text-red-400 border border-red-500/20 rounded-lg hover:bg-red-500/20 transition-colors">
           Sign Out
         </button>
       </div>

@@ -2,7 +2,7 @@ import { serverSupabaseUser } from "#supabase/server";
 
 export default defineEventHandler(async (event) => {
   const user = await serverSupabaseUser(event);
-  const userId = user?.id || (user as any)?.sub;
+  const userId = user?.sub;
 
   if (!userId) {
     throw createError({ statusCode: 401, statusMessage: "Unauthorized" });

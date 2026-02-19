@@ -6,4 +6,7 @@ export default defineNuxtConfig({
   supabase: {
     redirect: false,
   },
+  imports: {
+    dirs: ["shared/types/**"],
+  },
 });
