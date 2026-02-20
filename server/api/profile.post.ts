@@ -26,7 +26,8 @@ export default defineEventHandler(async (event) => {
   }
 
   // 3. Upsert (Insert or Update) profile
-  const savedProfile = await db
+  const savedProfile = await db.transaction().execute(async (trx) => {
+    const profile = await trx
     .insertInto("profiles")
     .values({
       id: randomUUID(),
@@ -46,8 +47,14 @@ export default defineEventHandler(async (event) => {
     .returningAll()
     .executeTakeFirst();
 
+    return profile
+  })
+
+  console.log("VIBE CHECK savedProfile: ", JSON.stringify(savedProfile));
+  
+
   return {
-    success: true,
+    success: savedProfile !== undefined,
     profile: savedProfile,
   };
 });

@@ -15,9 +15,15 @@ Based on `specs/main.md`, this plan outlines the steps to build the Time Sync Ev
 ## Phase 2: Core Feature - User Profile & Availability
 
 - [x] **Backend API**
-  - `POST /api/profile`: Update profile (timezone).
+  - `POST /api/profile/ensure`: Auto-create profile on sign-up/sign-in (called by client plugin).
+  - `POST /api/profile`: Update profile (name, timezone).
+  - `GET /api/profile`: Fetch current user's profile.
   - `GET /api/availability`: Fetch user availability.
   - `POST /api/availability`: Update user availability slots.
+- [x] **Auto Profile Creation**
+  - `server/utils/ensureProfile.ts`: Server utility — creates profile with defaults if not exists.
+  - `app/plugins/auto-profile.client.ts`: Client plugin — watches auth state, auto-ensures profile.
+  - `confirm.vue`: Also calls ensure on OTP verification for immediate availability.
 - [x] **Frontend Pages**
   - `/profile`: Form to edit name, timezone, and availability slots.
   - Component: `AvailabilityEditor` (Day/Time-range picker).

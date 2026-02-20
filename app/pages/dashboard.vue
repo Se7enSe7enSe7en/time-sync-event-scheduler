@@ -30,6 +30,12 @@ const logout = async () => {
         <h2 class="text-xl font-semibold mb-4">Welcome back!</h2>
         <p class="text-gray-400">User ID: {{ user?.id }}</p>
         <p class="text-gray-400">Email: {{ user?.email }}</p>
+        <div class="mt-4">
+          <NuxtLink to="/groups"
+            class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg font-medium transition-colors">
+            My Groups
+          </NuxtLink>
+        </div>
       </div>
     </div>
   </div>
