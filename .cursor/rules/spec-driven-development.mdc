@@ -1,0 +1,13 @@
+---
+description: Enforces spec-driven development by having the agent consult project specs and state before making changes, and keep them up to date.
+alwaysApply: true
+---
+
+# Spec Driven Development
+
+## Rules
+
+- Always check `specs/main.md` before proceeding.
+- Also check `specs/state.md` to review current progress; edit this file when necessary.
+- Make sure we are following the plan in the specs (e.g. `specs/main.md` or related spec files). If not, ask the user and update the specs together.
+

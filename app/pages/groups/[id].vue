@@ -22,12 +22,8 @@ definePageMeta({
 // REFERENCE: Look at how groups/index.vue (line 18-19) does it — same pattern!
 // Docs: https://nuxt.com/docs/api/composables/use-fetch
 
-// vibe-check: not sure about using the "{ group: Group, members: GroupMember[] }" directly to the Generics of useFetch<T>
-// vibe-check: if I were to make a new type for the response "{ group: Group, members: GroupMember[] }" how would I orginize the types for these in the types.ts
-const { data, pending, error } = useFetch<{
-  group: Group;
-  members: GroupMember[];
-}>(`/api/groups/${groupId}`);
+// Response type from shared/types/groups.ts — keeps API and frontend in sync.
+const { data, pending, error } = useFetch<GroupDetailResponse>(`/api/groups/${groupId}`);
 
 const group = computed(() => data.value?.group);
 const members = computed(() => data.value?.members);

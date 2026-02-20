@@ -6,6 +6,7 @@
 //   - server/api/groups/join.post.ts → same auth + getRouterParam pattern
 
 import { serverSupabaseUser } from "#supabase/server";
+import { GroupMember } from "~~/shared/types/types";
 
 export default defineEventHandler<Promise<GroupDetailResponse>>(
   async (event) => {
@@ -144,9 +145,9 @@ export default defineEventHandler<Promise<GroupDetailResponse>>(
             joined_at: member.joined_at,
             role: member.role as Role,
             email: member.email,
-            name: member.name,
+            name: member.name ?? undefined,
             timezone: member.timezone,
-          }) as GroupMember, // vibe-check: how do I deal with having a shared type GroupMember and the GroupMember type generated from prisma-kysely
+          }) satisfies GroupMember
       ),
     };
   },
