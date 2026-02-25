@@ -34,6 +34,38 @@ AI automation scheduler for self time management or small time event organizing 
 
 ## Backend
 
+### Architecture: 3-Layer Pattern
+
+The backend follows a **thin handler → service → utils/db** architecture:
+
+```
+server/
+├── api/                    # Layer 1: Thin Handlers (HTTP concerns only)
+│   └── *.ts                #   → Auth, validation, call service, return response
+├── services/               # Layer 2: Business Logic
+│   └── *.service.ts        #   → Domain rules, orchestration, reusable logic
+├── utils/                  # Layer 3: Utilities (auto-imported by Nuxt)
+│   └── db.ts               #   → Kysely instance, generic helpers
+└── types/
+    └── db.d.ts             # Generated Kysely types from Prisma
+```
+
+#### Layer Responsibilities
+
+| Layer                            | Does                                                                                                       | Does NOT                                          |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| **API Handler** (`server/api/`)  | Auth (`serverSupabaseUser`), parse/validate body, extract route params, call service, return HTTP response | Contain business logic, directly query DB         |
+| **Service** (`server/services/`) | Business logic, DB queries via Kysely, orchestrate transactions, throw domain errors                       | Know about HTTP, parse requests, format responses |
+| **Utils** (`server/utils/`)      | Provide generic helpers, DB connection, auto-imported by Nuxt                                              | Contain domain-specific business logic            |
+
+#### Conventions
+
+- Service files are named `<domain>.service.ts` (e.g., `profile.service.ts`)
+- Each service exports an object with methods (e.g., `export const profileService = { ... }`)
+- Services receive plain data as arguments (not the H3 event object)
+- Services throw errors using `createError()` for domain-level failures (e.g., "Profile not found")
+- A shared `requireAuth` utility extracts and validates the user from the event
+
 ### ORM + query builder + adapter: **prisma-kysely**
 
 - (Adapter) prisma-kysely: https://github.com/valtyr/prisma-kysely
