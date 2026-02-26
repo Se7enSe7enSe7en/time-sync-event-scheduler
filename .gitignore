@@ -23,4 +23,8 @@ logs
 .env.*
 !.env.example
 
-/app/generated/prisma
+# Spacetime DB
+spacetime.local.json
+
+.output
+dist

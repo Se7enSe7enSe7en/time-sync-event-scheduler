@@ -1,11 +1,12 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
-  devtools: { enabled: true },
-  modules: ["@nuxtjs/tailwindcss", "@nuxtjs/supabase"],
-  supabase: {
-    redirect: false,
+  telemetry: false,
+  devServer: {
+    port: 5173,
   },
+  devtools: { enabled: true },
+  modules: ["@nuxtjs/tailwindcss"],
   imports: {
     dirs: ["shared/types/**"],
   },

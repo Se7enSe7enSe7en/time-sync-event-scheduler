@@ -1,6 +1,3 @@
 onlyBuiltDependencies:
   - '@parcel/watcher'
-  - '@prisma/engines'
   - esbuild
-  - prisma
-  - supabase
