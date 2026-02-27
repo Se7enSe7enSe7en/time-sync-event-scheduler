@@ -2,8 +2,7 @@
 
 - nuxt.com
 - docs.n8n.io
-- prisma.io
-- kysely.dev
+- spacetimedb.com
 
 ## Install Frontend tools
 
@@ -31,16 +30,34 @@ pnpm dlx tailwindcss init
 
 ## Install Database and Backend tools
 
-### Install spacetimeDB cli
+### Install SpacetimeDB CLI
 
-#### for Mac:
+#### for Mac / Linux:
 
 ```sh
 curl -sSf https://install.spacetimedb.com | sh
 ```
 
-#### for Linux:
+### Start local SpacetimeDB server
 
 ```sh
-curl -sSf https://install.spacetimedb.com | sh
+spacetime start
+```
+
+### Publish the SpacetimeDB module (local)
+
+```sh
+pnpm run spacetime:publish:local
+```
+
+### Generate TypeScript client bindings
+
+```sh
+pnpm run spacetime:generate
+```
+
+### View SpacetimeDB logs
+
+```sh
+spacetime logs time-sync-event-scheduler
 ```

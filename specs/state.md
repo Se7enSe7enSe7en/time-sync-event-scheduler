@@ -3,8 +3,8 @@
 Based on `specs/main.md` and `specs/erd.md`, this plan outlines the steps to build the Time Sync Event Scheduler using **SpacetimeDB**.
 
 > **Migration note:** The project was previously built with Supabase + Prisma + Kysely.
-> That code still exists in `server/` and `shared/` but is now **legacy** and will be
-> removed as each phase is re-implemented with SpacetimeDB.
+> That legacy code has been removed. Frontend pages now contain commented SpacetimeDB
+> scaffolds with TODO guides for implementation.
 
 ---
 
@@ -27,12 +27,22 @@ Based on `specs/main.md` and `specs/erd.md`, this plan outlines the steps to bui
 - [ ] **Publish module** to local SpacetimeDB and generate client bindings
   - `spacetime publish --module-path spacetimedb --server local`
   - `spacetime generate --lang typescript --out-dir module_bindings --module-path spacetimedb`
-- [ ] **Remove legacy Supabase code**
-  - Delete `server/api/` (old REST endpoints)
-  - Delete `server/services/` (old service layer)
-  - Delete `server/utils/db.ts`, `server/utils/ensureProfile.ts`, `server/utils/requireAuth.ts`
-  - Delete `shared/types/` (will be replaced by generated module bindings)
-  - Remove any Supabase/Prisma/Kysely dependencies from `package.json`
+- [x] **Remove legacy Supabase code**
+  - ~~Delete `server/api/` (old REST endpoints)~~ ✅ Removed
+  - ~~Delete `server/services/` (old service layer)~~ ✅ Removed
+  - ~~Delete `server/utils/db.ts`, `server/utils/ensureProfile.ts`, `server/utils/requireAuth.ts`~~ ✅ Removed
+  - ~~Delete `shared/types/` (will be replaced by generated module bindings)~~ ✅ Removed
+  - ~~Delete `app/plugins/auto-profile.client.ts` (Supabase watcher)~~ ✅ Removed
+  - ~~Delete `app/pages/confirm.vue` (Supabase OTP flow)~~ ✅ Removed
+  - ~~Delete `app/pages/spacetimedb-example-page.vue` (boilerplate)~~ ✅ Removed
+  - ~~Update `nuxt.config.ts`, `.env.local`, `docs/setting-up.md`~~ ✅ Done
+- [x] **Scaffold frontend pages with SpacetimeDB TODOs**
+  - `app/middleware/auth.ts` — no-op scaffold with SpacetimeDB Identity TODO
+  - `app/pages/login.vue` — connect page scaffold
+  - `app/pages/dashboard.vue` — placeholder with commented useTable/useSpacetimeDB
+  - `app/pages/profile.vue` — full UI preserved, data layer replaced with TODO comments
+  - `app/pages/groups/index.vue` — full UI preserved, fetch → reducer TODOs
+  - `app/pages/groups/[id].vue` — full UI preserved, subscription TODOs
 
 ## Phase 2: Core Feature — User Profile & Availability
 
@@ -76,6 +86,6 @@ Based on `specs/main.md` and `specs/erd.md`, this plan outlines the steps to bui
 
 ---
 
-**Current Status**: Phase 1 — Foundation (SpacetimeDB schema not yet defined, legacy code pending cleanup)
+**Current Status**: Phase 1 — Foundation (legacy cleanup ✅ done, frontend scaffolded ✅, schema not yet defined)
 
 **Next Immediate Action**: Define the SpacetimeDB schema tables in `spacetimedb/src/schema.ts`
