@@ -6,9 +6,11 @@
 
 <template>
   <ClientOnly>
-    <SpacetimeDBProvider :connection-builder="connectionBuilder">
-      <NuxtPage />
-    </SpacetimeDBProvider>
+    <template v-if="connectionBuilder">
+      <SpacetimeDBProvider :connection-builder="connectionBuilder">
+        <NuxtPage />
+      </SpacetimeDBProvider>
+    </template>
     <template #fallback>
       <NuxtPage />
     </template>
@@ -18,7 +20,7 @@
 <script setup lang="ts">
 import { Identity } from "spacetimedb";
 import { SpacetimeDBProvider } from "spacetimedb/vue";
-import { DbConnection, type ErrorContext } from "./module_bindings";
+import { DbConnection, type ErrorContext } from "../module_bindings";
 
 const HOST = import.meta.env.VITE_SPACETIMEDB_HOST ?? "ws://localhost:3000";
 const DB_NAME = import.meta.env.VITE_SPACETIMEDB_DB_NAME ?? "nuxt-ts";

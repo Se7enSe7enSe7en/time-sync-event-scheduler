@@ -6,7 +6,7 @@ erDiagram
 
     Profile {
         uuid id PK
-        string user_id UK "Supabase Auth ID"
+        string user_id UK "SpacetimeDB Auth ID"
         string email UK
         string name "nullable"
         string timezone "default: UTC"
@@ -73,5 +73,5 @@ erDiagram
 
 - `GroupMember` has a **unique composite index** on `(group_id, profile_id)` — a profile can only join a group once.
 - `Availability` has an **index** on `profile_id` for fast lookups.
-- `Profile.user_id` is unique and maps to the **Supabase Auth** user ID.
+- `Profile.user_id` is unique and maps to the **SpacetimeDB Auth** user ID.
 - `Group.code` is unique and serves as the **invite/join code**.

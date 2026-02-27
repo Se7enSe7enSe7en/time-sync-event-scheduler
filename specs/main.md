@@ -44,11 +44,22 @@ server/
 │   └── *.ts                #   → Auth, validation, call service, return response
 ├── services/               # Layer 2: Business Logic
 │   └── *.service.ts        #   → Domain rules, orchestration, reusable logic
-├── utils/                  # Layer 3: Utilities (auto-imported by Nuxt)
-│   └── db.ts               #   → Kysely instance, generic helpers
-└── types/
-    └── db.d.ts             # Generated Kysely types from Prisma
+└── utils/                  # Layer 3: Utilities (auto-imported by Nuxt)
 ```
+
+### Backend stack: SpacetimeDB
+
+#### we use SpacetimeDB as our:
+
+- DB
+- ORM
+- Cache
+
+#### more info on SpacetimeDB:
+
+- What is SpacetimeDB: https://spacetimedb.com/docs/intro/what-is-spacetimedb
+- The Core principles of SpacetimeDB: https://spacetimedb.com/docs/intro/zen
+- SpacetimeDB FAQ: https://spacetimedb.com/docs/intro/faq
 
 #### Layer Responsibilities
 
@@ -66,16 +77,6 @@ server/
 - Services throw errors using `createError()` for domain-level failures (e.g., "Profile not found")
 - A shared `requireAuth` utility extracts and validates the user from the event
 
-### ORM + query builder + adapter: **prisma-kysely**
-
-- (Adapter) prisma-kysely: https://github.com/valtyr/prisma-kysely
-- (ORM) prisma: https://www.prisma.io/docs/guides/nuxt
-- (Query Builder) kysely: https://kysely.dev/docs/intro
-
-### DB: **supabase + postgresql**
-
-- postgresql: https://www.postgresql.org/docs/16/index.html
-
 ## Other tools
 
 ### Containerization: **Docker**
@@ -86,12 +87,12 @@ server/
 
 - n8n: https://docs.n8n.io/
 
-### Authentication: **Supabase Auth**
+### Authentication: **SpacetimeDB Auth**
 
-- supabase auth: https://supabase.com/docs/guides/auth
+- spacetimeDB auth: https://spacetimedb.com/docs/core-concepts/authentication/spacetimeauth/
 
-### AI provider: **Google Gemini**
+### AI provider: **Anthropic Claude**
 
 - note: this should be flexible to change in the future any provider should work but for now we choose gemini.
 
-- Gemini: https://ai.google.dev/gemini-api/docs
+- Claude Docs: https://platform.claude.com/docs/en/home
