@@ -30,52 +30,61 @@ AI automation scheduler for self time management or small time event organizing 
 - Typescript: https://www.typescriptlang.org/
 - Vue3 composition api: https://vuejs.org/api/composition-api-setup.html#composition-api-setup
 - tailwind: https://tailwindcss.com/
-- no state management, use Fetch or SSE if posible
+- no traditional state management — SpacetimeDB subscriptions (`useTable`) are the reactive data source
 
 ## Backend
 
-### Architecture: 3-Layer Pattern
+### Architecture: SpacetimeDB Module
 
-The backend follows a **thin handler → service → utils/db** architecture:
+The backend is a **SpacetimeDB module** — there is no traditional REST API layer. SpacetimeDB replaces the DB, ORM, cache, and API in one:
 
 ```
-server/
-├── api/                    # Layer 1: Thin Handlers (HTTP concerns only)
-│   └── *.ts                #   → Auth, validation, call service, return response
-├── services/               # Layer 2: Business Logic
-│   └── *.service.ts        #   → Domain rules, orchestration, reusable logic
-└── utils/                  # Layer 3: Utilities (auto-imported by Nuxt)
+spacetimedb/
+└── src/
+    ├── schema.ts      # Table definitions + schema export
+    └── index.ts       # Reducers, lifecycle hooks, imports schema
 ```
 
-### Backend stack: SpacetimeDB
+#### How SpacetimeDB replaces the old stack
 
-#### we use SpacetimeDB as our:
+| Old (Supabase/Kysely)              | New (SpacetimeDB)                                   |
+| ---------------------------------- | --------------------------------------------------- |
+| Prisma schema + migrations         | `table()` definitions in `schema.ts`                |
+| Kysely queries in services         | `ctx.db.tableName` access in reducers               |
+| REST API routes (`server/api/`)    | Reducers (for writes) + Subscriptions (for reads)   |
+| Service layer (`server/services/`) | Business logic lives inside reducers                |
+| Auth middleware (`requireAuth`)    | `ctx.sender` (SpacetimeDB Identity)                 |
+| `useFetch` / SSE on client         | `useTable(tables.tableName)` reactive subscriptions |
 
-- DB
-- ORM
-- Cache
+#### Data Flow
 
-#### more info on SpacetimeDB:
+```
+Client (Vue)                          SpacetimeDB Module
+─────────────                         ──────────────────
+useTable(tables.X) ◄──subscription──► Tables (reactive)
+conn.reducers.doX({...}) ──call────► Reducers (transactional writes)
+```
 
-- What is SpacetimeDB: https://spacetimedb.com/docs/intro/what-is-spacetimedb
-- The Core principles of SpacetimeDB: https://spacetimedb.com/docs/intro/zen
-- SpacetimeDB FAQ: https://spacetimedb.com/docs/intro/faq
-
-#### Layer Responsibilities
-
-| Layer                            | Does                                                                                                       | Does NOT                                          |
-| -------------------------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| **API Handler** (`server/api/`)  | Auth (`serverSupabaseUser`), parse/validate body, extract route params, call service, return HTTP response | Contain business logic, directly query DB         |
-| **Service** (`server/services/`) | Business logic, DB queries via Kysely, orchestrate transactions, throw domain errors                       | Know about HTTP, parse requests, format responses |
-| **Utils** (`server/utils/`)      | Provide generic helpers, DB connection, auto-imported by Nuxt                                              | Contain domain-specific business logic            |
+- **Reads**: Clients subscribe to tables → get real-time reactive data via `useTable()`
+- **Writes**: Clients call reducers → reducers validate + mutate tables → subscriptions auto-update
 
 #### Conventions
 
-- Service files are named `<domain>.service.ts` (e.g., `profile.service.ts`)
-- Each service exports an object with methods (e.g., `export const profileService = { ... }`)
-- Services receive plain data as arguments (not the H3 event object)
-- Services throw errors using `createError()` for domain-level failures (e.g., "Profile not found")
-- A shared `requireAuth` utility extracts and validates the user from the event
+- Schema and tables are defined in `spacetimedb/src/schema.ts`
+- Reducers and lifecycle hooks are defined in `spacetimedb/src/index.ts` (imports schema)
+- Reducer names come from exports: `export const create_group = spacetimedb.reducer(...)`
+- Client calls use object syntax: `conn.reducers.createGroup({ name: '...' })`
+- `ctx.sender` is the authenticated user identity — never trust client-provided identity args
+- Client bindings are generated into `module_bindings/` via `spacetime generate`
+
+#### Nuxt Server Layer
+
+The `server/` directory is reserved **only** for:
+
+- Proxy routes that need server-side secrets (e.g., N8N webhook triggers, AI API calls)
+- Any non-SpacetimeDB integrations that require a traditional HTTP endpoint
+
+It is **NOT** used for CRUD operations — those go through SpacetimeDB reducers and subscriptions.
 
 ## Other tools
 
@@ -93,6 +102,6 @@ server/
 
 ### AI provider: **Anthropic Claude**
 
-- note: this should be flexible to change in the future any provider should work but for now we choose gemini.
+- note: this should be flexible to change in the future, any provider should work but for now we choose Claude.
 
 - Claude Docs: https://platform.claude.com/docs/en/home

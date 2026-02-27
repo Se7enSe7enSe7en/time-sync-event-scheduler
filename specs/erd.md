@@ -1,55 +1,57 @@
 # Entity Relationship Diagram
 
+> **Note:** This ERD uses SpacetimeDB-native types. `Identity` is the SpacetimeDB user
+> identity (from `ctx.sender`). All other IDs are `u64` auto-increment. There are no UUIDs.
+
 ```mermaid
 erDiagram
     direction TB
 
     Profile {
-        uuid id PK
-        string user_id UK "SpacetimeDB Auth ID"
+        Identity identity PK "ctx.sender — SpacetimeDB Identity"
         string email UK
-        string name "nullable"
+        string name "optional"
         string timezone "default: UTC"
-        datetime created_at
-        datetime updated_at
+        Timestamp created_at
+        Timestamp updated_at
     }
 
     Group {
-        uuid id PK
+        u64 id PK "auto-increment"
         string name
-        string description "nullable"
+        string description "optional"
         string code UK "invite code"
-        uuid owner_id FK
-        datetime created_at
-        datetime updated_at
+        Identity owner_id FK "Profile.identity"
+        Timestamp created_at
+        Timestamp updated_at
     }
 
     GroupMember {
-        uuid id PK
-        uuid group_id FK
-        uuid profile_id FK
+        u64 id PK "auto-increment"
+        u64 group_id FK "Group.id"
+        Identity profile_id FK "Profile.identity"
         string role "ADMIN | MEMBER"
-        datetime joined_at
+        Timestamp joined_at
     }
 
     Availability {
-        uuid id PK
-        uuid profile_id FK
-        int day_of_week "0=Sun … 6=Sat"
+        u64 id PK "auto-increment"
+        Identity profile_id FK "Profile.identity"
+        u64 day_of_week "0=Sun … 6=Sat"
         string start_time "HH:mm 24h"
         string end_time "HH:mm 24h"
     }
 
     Event {
-        uuid id PK
-        uuid group_id FK
+        u64 id PK "auto-increment"
+        u64 group_id FK "Group.id"
         string title
-        string description "nullable"
-        datetime start_time
-        datetime end_time
-        string location "nullable"
-        datetime created_at
-        datetime updated_at
+        string description "optional"
+        Timestamp start_time
+        Timestamp end_time
+        string location "optional"
+        Timestamp created_at
+        Timestamp updated_at
     }
 
     Profile ||--o{ Group : "owns"
@@ -69,9 +71,35 @@ erDiagram
 | **Group → GroupMember**    | One-to-Many | A group can have many members                   |
 | **Group → Event**          | One-to-Many | A group can have many scheduled events          |
 
+## SpacetimeDB Type Mapping
+
+| ERD Type    | SpacetimeDB Type                 | Notes                                                     |
+| ----------- | -------------------------------- | --------------------------------------------------------- |
+| `Identity`  | `t.identity()`                   | User identity from `ctx.sender`, used as PK for `Profile` |
+| `u64`       | `t.u64().primaryKey().autoInc()` | Auto-increment primary key for other tables               |
+| `string`    | `t.string()`                     | Text fields                                               |
+| `Timestamp` | `t.timestamp()`                  | Use `ctx.timestamp` for current time in reducers          |
+| `optional`  | `.optional()` modifier           | e.g., `t.string().optional()`                             |
+
 ## Constraints
 
-- `GroupMember` has a **unique composite index** on `(group_id, profile_id)` — a profile can only join a group once.
-- `Availability` has an **index** on `profile_id` for fast lookups.
-- `Profile.user_id` is unique and maps to the **SpacetimeDB Auth** user ID.
-- `Group.code` is unique and serves as the **invite/join code**.
+- `GroupMember` has an **index** on `group_id` for fast lookups (`group_member_group_id`).
+- `GroupMember` has an **index** on `profile_id` for fast lookups (`group_member_profile_id`).
+- Uniqueness of `(group_id, profile_id)` is enforced in the **reducer logic** (check before insert).
+- `Availability` has an **index** on `profile_id` for fast lookups (`availability_profile_id`).
+- `Group` has an **index** on `owner_id` for fast lookups (`group_owner_id`).
+- `Event` has an **index** on `group_id` for fast lookups (`event_group_id`).
+- `Profile.identity` is the primary key (unique by definition).
+- `Group.code` uniqueness is enforced in the **reducer logic** (check before insert).
+
+## Index Naming Convention
+
+All indexes follow the pattern `{table_name}_{column_name}` to avoid name collisions across the module:
+
+| Table          | Index Name                | Column      |
+| -------------- | ------------------------- | ----------- |
+| `Group`        | `group_owner_id`          | `ownerId`   |
+| `GroupMember`  | `group_member_group_id`   | `groupId`   |
+| `GroupMember`  | `group_member_profile_id` | `profileId` |
+| `Availability` | `availability_profile_id` | `profileId` |
+| `Event`        | `event_group_id`          | `groupId`   |
