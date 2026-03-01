@@ -1,4 +1,29 @@
 // ============================================================
+// REDUCERS & LIFECYCLE — SpacetimeDB Module Logic
+// ============================================================
+// This file imports the schema and defines all reducers.
+//
+// PATTERN:
+//   export const reducer_name = spacetimedb.reducer(PARAMS, (ctx, args) => { ... })
+//   - Reducer name comes from the EXPORT, not a string argument
+//   - Params use t.type() just like table columns
+//   - Client calls use camelCase: conn.reducers.reducerName({ ... })
+//   - Client calls use OBJECT syntax: { param: 'value' } NOT positional args
+//
+// RULES:
+//   - Reducers are transactional — they do NOT return data to callers
+//   - Reducers must be deterministic — no filesystem, network, timers, random
+//   - Use ctx.sender for the authenticated user identity
+//   - Use ctx.timestamp for current time
+//   - Use ctx.db.tableName for CRUD
+//   - insert() returns the ROW, not the ID
+//   - Auto-inc fields require 0n as placeholder: { id: 0n, ... }
+//   - Update requires spreading the existing row: { ...existing, field: newValue }
+//
+// REFERENCE: specs/spacetimedb-typescript.md § 4 (Reducers)
+// ============================================================
+
+// ============================================================
 // SCHEMA — SpacetimeDB Table Definitions
 // ============================================================
 // This file defines ALL tables for the module. Reducers go in index.ts.
@@ -18,7 +43,7 @@
 //            specs/erd.md (full ERD + index naming table)
 // ============================================================
 
-import { schema, table, t } from "spacetimedb/server";
+import { schema, table, t, SenderError } from "spacetimedb/server";
 
 // ─── Profile ────────────────────────────────────────────────
 // The user's profile. Uses `Identity` (from ctx.sender) as PK.
@@ -63,6 +88,26 @@ const profile = table(
 //
 // Indexes needed:
 //   { name: 'group_owner_id', algorithm: 'btree', columns: ['ownerId'] }
+
+const group = table(
+  {
+    name: "group",
+    public: true,
+    indexes: [
+      { name: "group_owner_id", algorithm: "btree", columns: ["owner_id"] }, // vibe-check: I don't fully understand this line
+    ],
+  },
+  {
+    id: t.u64().primaryKey().autoInc(),
+    name: t.string(),
+    description: t.string().optional(),
+    code: t.string(),
+    owner_id: t.identity(),
+    created_at: t.timestamp(),
+    updated_at: t.timestamp(),
+  },
+);
+
 //
 // Example:
 //   const group = table(
@@ -98,7 +143,28 @@ const profile = table(
 //   { name: 'group_member_profile_id', algorithm: 'btree', columns: ['profileId'] }
 //
 // Uniqueness of (groupId, profileId) is enforced in reducer logic.
-//
+
+const groupMember = table(
+  {
+    name: "group_member",
+    public: true,
+    indexes: [
+      {
+        name: "group_member_group_id_profile_id",
+        algorithm: "hash",
+        columns: ["group_id", "profile_id"],
+      },
+    ],
+  },
+  {
+    id: t.u64().primaryKey().autoInc(),
+    group_id: t.u64(),
+    profile_id: t.identity(),
+    role: t.enum("Role", ["ADMIN", "MEMBER"]),
+    joined_at: t.timestamp(),
+  },
+);
+
 // Example:
 //   const groupMember = table(
 //     {
@@ -131,6 +197,28 @@ const profile = table(
 //
 // Indexes needed:
 //   { name: 'availability_profile_id', algorithm: 'btree', columns: ['profileId'] }
+
+const availability = table(
+  {
+    name: "availability",
+    public: true,
+    indexes: [
+      {
+        name: "availability_profile_id",
+        algorithm: "btree",
+        columns: ["profile_id"],
+      },
+    ],
+  },
+  {
+    id: t.u64().primaryKey().autoInc(),
+    profile_id: t.identity(),
+    day_of_week: t.u64(),
+    start_time: t.string(),
+    end_time: t.string(),
+  },
+);
+
 //
 // Example:
 //   const availability = table(
@@ -168,6 +256,25 @@ const profile = table(
 // Indexes needed:
 //   { name: 'event_group_id', algorithm: 'btree', columns: ['groupId'] }
 //
+
+const event = table(
+  {
+    name: "event",
+    public: true,
+  },
+  {
+    id: t.u64().primaryKey().autoInc(),
+    group_id: t.u64(),
+    title: t.string(),
+    description: t.string().optional(),
+    start_time: t.timestamp(),
+    end_time: t.timestamp(),
+    location: t.string().optional(),
+    created_at: t.timestamp(),
+    updated_at: t.timestamp(),
+  },
+);
+
 // Example:
 //   const event = table(
 //     {
@@ -204,10 +311,10 @@ const profile = table(
 // ============================================================
 const spacetimedb = schema({
   profile,
-  // TODO: Uncomment as you implement each table:
-  // group,
-  // groupMember,
-  // availability,
-  // event,
+  group,
+  groupMember,
+  availability,
+  event,
 });
+
 export default spacetimedb;

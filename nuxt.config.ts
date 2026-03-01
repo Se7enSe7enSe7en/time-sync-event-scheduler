@@ -8,7 +8,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: ["@nuxtjs/tailwindcss"],
 
-  // NOTE: shared/types/ was removed (old Supabase/Prisma types).
-  // SpacetimeDB types come from module_bindings/ (auto-generated).
-  // If you need custom shared types, create them and add the path here.
+  // imports: {
+  //   dirs: ["./module_bindings"], // TODO: change this later, module_bindings should be /shared folder
+  // },
 });

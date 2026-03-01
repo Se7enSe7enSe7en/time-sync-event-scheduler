@@ -1,32 +1,8 @@
-// ============================================================
-// REDUCERS & LIFECYCLE — SpacetimeDB Module Logic
-// ============================================================
-// This file imports the schema and defines all reducers.
-//
-// PATTERN:
-//   export const reducer_name = spacetimedb.reducer(PARAMS, (ctx, args) => { ... })
-//   - Reducer name comes from the EXPORT, not a string argument
-//   - Params use t.type() just like table columns
-//   - Client calls use camelCase: conn.reducers.reducerName({ ... })
-//   - Client calls use OBJECT syntax: { param: 'value' } NOT positional args
-//
-// RULES:
-//   - Reducers are transactional — they do NOT return data to callers
-//   - Reducers must be deterministic — no filesystem, network, timers, random
-//   - Use ctx.sender for the authenticated user identity
-//   - Use ctx.timestamp for current time
-//   - Use ctx.db.tableName for CRUD
-//   - insert() returns the ROW, not the ID
-//   - Auto-inc fields require 0n as placeholder: { id: 0n, ... }
-//   - Update requires spreading the existing row: { ...existing, field: newValue }
-//
-// REFERENCE: specs/spacetimedb-typescript.md § 4 (Reducers)
-// ============================================================
-
+import { SenderError, t } from "spacetimedb/server";
 import spacetimedb from "./schema";
+
 // Re-export so SpacetimeDB's bundler finds the schema from the entrypoint
 export default spacetimedb;
-import { t, SenderError } from "spacetimedb/server";
 
 // ─── Lifecycle Hooks ────────────────────────────────────────
 
@@ -48,6 +24,18 @@ export const onConnect = spacetimedb.clientConnected((_ctx) => {
   //       updatedAt: ctx.timestamp,
   //     });
   //   }
+
+  const existing = _ctx.db.profile.identity.find(_ctx.sender);
+  if (!existing) {
+    _ctx.db.profile.insert({
+      identity: _ctx.sender,
+      email: "",
+      name: undefined,
+      timezone: "UTC",
+      createdAt: _ctx.timestamp,
+      updatedAt: _ctx.timestamp,
+    });
+  }
 });
 
 export const onDisconnect = spacetimedb.clientDisconnected((_ctx) => {
@@ -132,6 +120,39 @@ export const update_profile = spacetimedb.reducer(
 //   2. Insert the Group row: ctx.db.group.insert({ id: 0n, name, ... })
 //   3. Insert a GroupMember row for the creator with role: 'ADMIN'
 //
+
+export const create_group = spacetimedb.reducer(
+  {
+    name: t.string(),
+    description: t.string().optional(),
+  },
+  (ctx, { name, description }) => {
+    const profile = ctx.db.profile.identity.find(ctx.sender);
+    if (!profile) throw new SenderError("create_group(): No profile");
+
+    const code = ""; // vibe-check: I need help implementing a 6-char alphanumeric unique invite code
+
+    const groupRow = ctx.db.group.insert({
+      id: 0n, // vibe-check: what is this? "0n"
+      name,
+      description,
+      code,
+      owner_id: ctx.sender,
+      created_at: ctx.timestamp,
+      updated_at: ctx.timestamp,
+    });
+
+    // make creator of group as admin
+    ctx.db.groupMember.insert({
+      id: 0n,
+      group_id: groupRow.id,
+      profile_id: ctx.sender,
+      role: { tag: "ADMIN" },
+      joined_at: ctx.timestamp,
+    });
+  },
+);
+
 // export const create_group = spacetimedb.reducer(
 //   { name: t.string() },
 //   (ctx, { name }) => {
@@ -171,6 +192,36 @@ export const update_profile = spacetimedb.reducer(
 //   2. Check the user isn't already a member (enforce uniqueness)
 //   3. Insert a GroupMember row with role: 'MEMBER'
 //
+
+export const join_group = spacetimedb.reducer(
+  { code: t.string() },
+  (ctx, { code }) => {
+    const profile = ctx.db.profile.identity.find(ctx.sender);
+    if (!profile) throw new SenderError("join_group(): No profile");
+
+    let targetGroup;
+
+    // TODO: change spec for join code later,
+    // some groups should be able to last long
+    // so this means we might want the code to be longer
+    // or something similar to discord where we use a link instead
+    for (const group of ctx.db.group.iter()) {
+      if (group.code === code) {
+        targetGroup = group;
+        break;
+      }
+    }
+    if (!targetGroup)
+      throw new SenderError(
+        `join_group(): No group found with this code: ${code}`,
+      );
+
+    // check if user is already a member
+    for (const groupMember of ctx.db.groupMember.iter()) {
+    }
+  },
+);
+
 // export const join_group = spacetimedb.reducer(
 //   { code: t.string() },
 //   (ctx, { code }) => {

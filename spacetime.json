@@ -1,4 +1,8 @@
 {
-  "server": "maincloud",
-  "module-path": "./spacetimedb"
+  "dev": {
+    "run": "pnpm run dev"
+  },
+  "module-path": "./spacetimedb",
+  "database": "time-sync-event-scheduler-rfo1b",
+  "server": "maincloud"
 }
