@@ -43,7 +43,7 @@
 //            specs/erd.md (full ERD + index naming table)
 // ============================================================
 
-import { schema, table, t, SenderError } from "spacetimedb/server";
+import { schema, table, t } from "spacetimedb/server";
 
 // ─── Profile ────────────────────────────────────────────────
 // The user's profile. Uses `Identity` (from ctx.sender) as PK.
@@ -94,7 +94,7 @@ const group = table(
     name: "group",
     public: true,
     indexes: [
-      { name: "group_owner_id", algorithm: "btree", columns: ["owner_id"] }, // vibe-check: I don't fully understand this line
+      { accessor: "group_owner_id", algorithm: "btree", columns: ["owner_id"] }, // vibe-check: I don't fully understand this line
     ],
   },
   {
@@ -150,7 +150,7 @@ const groupMember = table(
     public: true,
     indexes: [
       {
-        name: "group_member_group_id_profile_id",
+        accessor: "group_member_group_profile_id",
         algorithm: "hash",
         columns: ["group_id", "profile_id"],
       },
@@ -204,7 +204,7 @@ const availability = table(
     public: true,
     indexes: [
       {
-        name: "availability_profile_id",
+        accessor: "availability_profile_id",
         algorithm: "btree",
         columns: ["profile_id"],
       },

@@ -8,7 +8,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: ["@nuxtjs/tailwindcss"],
 
-  // imports: {
-  //   dirs: ["./module_bindings"], // TODO: change this later, module_bindings should be /shared folder
-  // },
+  imports: {
+    dirs: ["module_bindings/**"], // TODO: change this later, module_bindings should be /shared folder
+  },
 });

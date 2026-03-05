@@ -130,7 +130,7 @@ export const create_group = spacetimedb.reducer(
     const profile = ctx.db.profile.identity.find(ctx.sender);
     if (!profile) throw new SenderError("create_group(): No profile");
 
-    const code = ""; // vibe-check: I need help implementing a 6-char alphanumeric unique invite code
+    const code = ctx.newUuidV7().toString(); // vibe-check: I need help implementing a 6-char alphanumeric unique invite code
 
     const groupRow = ctx.db.group.insert({
       id: 0n, // vibe-check: what is this? "0n"
@@ -217,8 +217,21 @@ export const join_group = spacetimedb.reducer(
       );
 
     // check if user is already a member
-    for (const groupMember of ctx.db.groupMember.iter()) {
+    for (const groupMember of ctx.db.groupMember.group_member_group_profile_id.filter(
+      [targetGroup.id, profile.identity],
+    )) {
+      if (groupMember.profile_id.isEqual(ctx.sender)) {
+        throw new SenderError("join_group(): Already a member of this group");
+      }
     }
+
+    ctx.db.groupMember.insert({
+      id: 0n,
+      group_id: targetGroup.id,
+      profile_id: ctx.sender,
+      role: { tag: "MEMBER" },
+      joined_at: ctx.timestamp,
+    });
   },
 );
 
@@ -256,6 +269,16 @@ export const join_group = spacetimedb.reducer(
 // TODO: Leaves a group. Delete the GroupMember row.
 // Client: conn.reducers.leaveGroup({ groupId: 1n })
 //
+export const leave_group = spacetimedb.reducer(
+  { groupId: t.u64() },
+  (ctx, { groupId }) => {
+    ctx.db.groupMember.group_member_group_profile_id.delete([
+      groupId,
+      ctx.sender,
+    ]);
+  },
+);
+
 // export const leave_group = spacetimedb.reducer(
 //   { groupId: t.u64() },
 //   (ctx, { groupId }) => {
